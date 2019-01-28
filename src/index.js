@@ -1,4 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, Menu, session } from 'electron';
+import GmailWindow from './window';
+import GmailTray from './tray';
+import GmailMenu from './menu';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -8,33 +11,89 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let tray;
+let menubar = new GmailMenu(app);
+
+const trayMenu = [
+  {
+    label: 'Show App',
+    click: () => {
+      if (tray && !tray.isDestroyed()) {
+        tray.destroy();
+      }
+      mainWindow.show();
+    }
+  },
+  {
+    label: 'Quit',
+    click: () => {
+      app.isQuitting = true;
+      app.quit();
+    }
+  }
+];
 
 const createWindow = () => {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
+  mainWindow = new GmailWindow({
+    width: 1024,
     height: 600,
+    webPreferences: {
+      nodeIntegration: false
+    }
+  });
+
+  mainWindow.on('closed', () => {
+    if (tray && !tray.isDestroyed()) {
+      tray.destroy();
+    }
+  });
+
+  mainWindow.on('close', (e) => {
+    console.log(app.isQuitting);
+    if (!app.isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+      if (!tray || tray.isDestroyed()) {
+        tray = new GmailTray(trayMenu);
+      }
+    } else {
+      return false;
+    }
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  // mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.loadURL('https://mail.google.com/');
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
+  // tray = new GmailTray(menu);
+};
+
+const secureSession = () => {
+  session.defaultSession.webRequest.onHeadersReceived((details, calback) => {
+    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com 'unsafe-inline'`];
+    calback({
+      responseHeaders: details.responseHeaders
+    });
   });
+};
+
+const createAppMenu = () => {
+  Menu.setApplicationMenu(menubar.getMenu());
+};
+
+const init = () => {
+  createWindow();
+  createAppMenu();
+  secureSession();
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', init);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -52,6 +111,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
