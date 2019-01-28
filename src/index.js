@@ -18,9 +18,6 @@ const trayMenu = [
   {
     label: 'Show App',
     click: () => {
-      if (tray && !tray.isDestroyed()) {
-        tray.destroy();
-      }
       mainWindow.show();
     }
   },
@@ -37,6 +34,7 @@ const createWindow = () => {
   mainWindow = new GmailWindow({
     width: 1024,
     height: 600,
+    icon: `${__dirname}/img/icon_gmail_512.png`,
     webPreferences: {
       nodeIntegration: false
     }
@@ -49,15 +47,23 @@ const createWindow = () => {
   });
 
   mainWindow.on('close', (e) => {
-    console.log(app.isQuitting);
     if (!app.isQuitting) {
       e.preventDefault();
       mainWindow.hide();
-      if (!tray || tray.isDestroyed()) {
-        tray = new GmailTray(trayMenu);
-      }
     } else {
       return false;
+    }
+  });
+
+  mainWindow.on('show', (e) => {
+    if (tray && !tray.isDestroyed()) {
+      tray.destroy();
+    }
+  });
+
+  mainWindow.on('hide', (e) => {
+    if (!tray || tray.isDestroyed()) {
+      tray = new GmailTray(trayMenu);
     }
   });
 
@@ -72,9 +78,10 @@ const createWindow = () => {
 };
 
 const secureSession = () => {
-  session.defaultSession.webRequest.onHeadersReceived((details, calback) => {
-    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com 'unsafe-inline'`];
-    calback({
+  session.defaultSession.webRequest.onHeadersReceived((details, cb) => {
+    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com 'unsafe-inline'; img-src https://ssl.gstatic.com`];
+    // eslint-disable-next-line standard/no-callback-literal
+    cb({
       responseHeaders: details.responseHeaders
     });
   });

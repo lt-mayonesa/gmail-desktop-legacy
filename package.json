@@ -1,8 +1,8 @@
 {
   "name": "gmail-desktop",
-  "productName": "gmail-desktop",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "productName": "Gmail Desktop",
+  "version": "0.1.0",
+  "description": "Gmail Electron App",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -34,14 +34,20 @@
       "electronWinstallerConfig": {
         "name": "gmail_desktop"
       },
-      "electronInstallerDebian": {},
+      "electronInstallerDebian": {
+        "icon": "assets/icon_gmail_512.png",
+        "categories": [
+          "Utility",
+          "Network"
+        ]
+      },
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "owner": "lt-mayonesa",
+        "name": "gmail-desktop"
       },
       "windowsStoreConfig": {
-        "packageName": "",
+        "packageName": "com.joaquincampero",
         "name": "gmaildesktop"
       }
     }

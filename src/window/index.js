@@ -11,8 +11,8 @@ export default class GmailWindow extends BrowserWindow {
   }
 
   initWebContents () {
-    this.webContents.on('did-finish-load', this.overrideAlertBehaviour);
-    this.webContents.on('new-window', this.overrideNewWindowBehaviour);
+    this.webContents.on('did-finish-load', () => this.overrideAlertBehaviour());
+    this.webContents.on('new-window', (e, u) => this.overrideNewWindowBehaviour(e, u));
   }
 
   overrideAlertBehaviour () {
@@ -26,9 +26,7 @@ export default class GmailWindow extends BrowserWindow {
   overrideNewWindowBehaviour (event, url) {
     if (/^(https:\/\/(mail|accounts)\.google\.com).*/.test(url)) {
       event.preventDefault();
-      if (this.isVisible()) {
-        this.hide();
-      } else {
+      if (!this.isVisible()) {
         if (this.isMinimized()) {
           this.restore();
         }

@@ -2,7 +2,7 @@ import { Menu, Tray } from 'electron';
 
 export default class GmailTray extends Tray {
   constructor (props) {
-    super(`${__dirname}/../../assets/icon_gmail_16.png`);
+    super(`${__dirname}/../img/icon_gmail_16.png`);
     this.props = props;
     this.init();
   }
