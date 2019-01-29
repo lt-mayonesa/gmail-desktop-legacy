@@ -16,7 +16,6 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "executableName": "gmail-desktop",
       "make_targets": {
         "win32": [
           "squirrel"
@@ -30,6 +29,7 @@
         ]
       },
       "electronPackagerConfig": {
+        "executableName": "gmail-desktop",
         "packageManager": "npm"
       },
       "electronWinstallerConfig": {
