@@ -9,10 +9,8 @@ addons:
   apt:
     update: true
     packages:
+      - rpm
       - fakeroot
-  yum:
-    packages:
-      - rpm-build
 
 install:
   - npm install
