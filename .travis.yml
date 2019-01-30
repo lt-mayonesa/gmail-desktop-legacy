@@ -1,9 +1,14 @@
 language: node_js
 sudo: false
 node_js:
-  - 10
-  - 9
   - 8
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: required
+    - os: osx
 
 addons:
   apt:
@@ -14,6 +19,10 @@ addons:
 
 install:
   - npm install
+
+cache:
+  directories:
+    - node_modules
 
 script:
   - npm test
@@ -26,7 +35,8 @@ os:
 deploy:
   provider: releases
   api_key: $TOKEN
-  file: "out/make/*"
+  file: out/make/*
   skip_cleanup: true
   on:
     tags: true
+    node: 8
