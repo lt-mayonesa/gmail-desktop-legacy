@@ -16,6 +16,7 @@ install:
 cache:
   directories:
     - node_modules
+    - $HOME/.cache/electron
 
 script:
   - npm test

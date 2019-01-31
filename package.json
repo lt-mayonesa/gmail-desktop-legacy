@@ -29,6 +29,9 @@
         ]
       },
       "electronPackagerConfig": {
+        "ignore": [
+          ".idea"
+        ],
         "executableName": "gmail-desktop",
         "packageManager": "npm"
       },
