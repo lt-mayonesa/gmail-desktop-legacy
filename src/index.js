@@ -1,7 +1,7 @@
-import { app, Menu, session } from 'electron';
-import GmailWindow from './window';
+import { app, session } from 'electron';
 import GmailTray from './tray';
-import GmailMenu from './menu';
+import { GmailMenu, ComposeMenu } from './menu';
+import { GmailWindow, ComposeWindow } from './window';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -11,10 +11,21 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let composeWindow;
 let tray;
-let menubar = new GmailMenu(app);
+let menubar;
 
 const trayMenu = [
+  {
+    label: 'Compose New Message',
+    click: () => {
+      composeWindow = new ComposeWindow();
+      composeWindow.loadURL(`https://mail.google.com/mail/?view=cm&fs=1`);
+      let menu = new ComposeMenu(app, composeWindow);
+      composeWindow.setMenu(menu.build());
+    }
+  },
+  { type: 'separator' },
   {
     label: 'Show App',
     click: () => {
@@ -31,14 +42,7 @@ const trayMenu = [
 ];
 
 const createWindow = () => {
-  mainWindow = new GmailWindow({
-    width: 1024,
-    height: 600,
-    icon: `${__dirname}/img/icon_gmail_512.png`,
-    webPreferences: {
-      nodeIntegration: false
-    }
-  });
+  mainWindow = new GmailWindow();
 
   mainWindow.on('closed', () => {
     if (tray && !tray.isDestroyed()) {
@@ -73,13 +77,11 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-
-  // tray = new GmailTray(menu);
 };
 
 const secureSession = () => {
   session.defaultSession.webRequest.onHeadersReceived((details, cb) => {
-    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com 'unsafe-inline'; img-src https://ssl.gstatic.com`];
+    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com https://*.gstatic.com 'unsafe-inline'`];
     // eslint-disable-next-line standard/no-callback-literal
     cb({
       responseHeaders: details.responseHeaders
@@ -88,13 +90,15 @@ const secureSession = () => {
 };
 
 const createAppMenu = () => {
-  Menu.setApplicationMenu(menubar.getMenu());
+  menubar = new GmailMenu(app, mainWindow);
+  menubar.show();
+  menubar.autohide();
 };
 
 const init = () => {
+  secureSession();
   createWindow();
   createAppMenu();
-  secureSession();
 };
 
 // This method will be called when Electron has finished

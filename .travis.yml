@@ -3,6 +3,11 @@ sudo: false
 node_js:
   - 8
 
+branches:
+  only:
+    - master
+    - develop
+
 addons:
   apt:
     update: true
@@ -20,11 +25,13 @@ cache:
 
 script:
   - npm test
-  - npm run make
 
 os:
   - linux
   - osx
+
+before_deploy:
+  - npm run make
 
 deploy:
   provider: releases
