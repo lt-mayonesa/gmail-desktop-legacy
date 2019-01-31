@@ -1,8 +1,6 @@
 language: node_js
 sudo: false
 node_js:
-  - 10
-  - 9
   - 8
 
 addons:
@@ -15,6 +13,11 @@ addons:
 install:
   - npm install
 
+cache:
+  directories:
+    - node_modules
+    - $HOME/.cache/electron
+
 script:
   - npm test
   - npm run make
@@ -26,7 +29,9 @@ os:
 deploy:
   provider: releases
   api_key: $TOKEN
-  file: "out/make/*"
+  file_glob: true
+  file: out/make/*
   skip_cleanup: true
   on:
     tags: true
+    node: 8
