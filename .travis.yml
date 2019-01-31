@@ -3,13 +3,6 @@ sudo: false
 node_js:
   - 8
 
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      sudo: required
-    - os: osx
-
 addons:
   apt:
     update: true
@@ -35,6 +28,7 @@ os:
 deploy:
   provider: releases
   api_key: $TOKEN
+  file_glob: true
   file: out/make/*
   skip_cleanup: true
   on:
