@@ -1,11 +1,12 @@
 import { BrowserWindow, shell } from 'electron';
+import path from 'path';
 
 export class GmailWindow extends BrowserWindow {
-  constructor (props) {
+  constructor () {
     super({
       width: 1024,
       height: 600,
-      icon: `${__dirname}/img/icon_gmail_512.png`,
+      icon: path.join(__dirname, '..', 'static', 'icon_gmail_512.png'),
       webPreferences: {
         nodeIntegration: false
       }
@@ -18,16 +19,33 @@ export class GmailWindow extends BrowserWindow {
   }
 
   initWebContents () {
-    this.webContents.on('did-finish-load', () => this.overrideAlertBehaviour());
+    this.webContents.on('did-finish-load', () => this.executeJsOverrides());
     this.webContents.on('new-window', (e, u) => this.overrideNewWindowBehaviour(e, u));
+  }
+
+  executeJsOverrides () {
+    this.overrideAlertBehaviour();
+    this.overrideNotificationBehaviour();
   }
 
   overrideAlertBehaviour () {
     this.webContents.executeJavaScript(
       `window.alert = (message) => console.log('Alert interrupted', message);`)
       .then((result) => {
-        console.log(result);
+        console.log('Alert overriden:', result);
       });
+  }
+
+  overrideNotificationBehaviour () {
+    this.webContents.executeJavaScript(
+      `
+      let NotOld = Notification;
+      Notification = function (title, props) {
+        console.log('not', title, props);
+        new NotOld(title, props);
+      }`
+    )
+      .then((res) => console.log('Notification overriden:', res));
   }
 
   overrideNewWindowBehaviour (event, url) {

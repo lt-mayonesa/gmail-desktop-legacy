@@ -1,14 +1,15 @@
 import { BrowserWindow, screen } from 'electron';
+import path from 'path';
 
 const WIDTH = 600;
 const HEIGHT = 500;
 
 export class ComposeWindow extends BrowserWindow {
-  constructor (props) {
+  constructor () {
     super({
       width: WIDTH,
       height: HEIGHT,
-      icon: `${__dirname}/img/icon_compose.png`,
+      icon: path.join(__dirname, '..', 'static', 'icon_compose.png'),
       webPreferences: {
         nodeIntegration: false
       },

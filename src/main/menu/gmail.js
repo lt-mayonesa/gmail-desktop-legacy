@@ -22,7 +22,10 @@ export class GmailMenu {
       this.template.push(windowEntry());
     }
     this.template.push(helpEntry(
-      () => shell.openExternal('https://github.com/Lt-Mayonesa/gmail-desktop')
+      // () => shell.openExternal('https://github.com/Lt-Mayonesa/gmail-desktop')
+      () => {
+        this.window.webContents.executeJavaScript(`new Notification('test')`).then((res) => console.log('caca', res));
+      }
     ));
     return Menu.buildFromTemplate(this.template);
   }

@@ -1,7 +1,7 @@
 import { app, session } from 'electron';
 import GmailTray from './tray';
-import { GmailMenu, ComposeMenu } from './menu';
-import { GmailWindow, ComposeWindow } from './window';
+import { ComposeMenu, GmailMenu } from './menu';
+import { ComposeWindow, GmailWindow } from './window';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -59,20 +59,19 @@ const createWindow = () => {
     }
   });
 
-  mainWindow.on('show', (e) => {
+  mainWindow.on('show', () => {
     if (tray && !tray.isDestroyed()) {
       tray.destroy();
     }
   });
 
-  mainWindow.on('hide', (e) => {
+  mainWindow.on('hide', () => {
     if (!tray || tray.isDestroyed()) {
       tray = new GmailTray(trayMenu);
     }
   });
 
   // and load the index.html of the app.
-  // mainWindow.loadURL(`file://${__dirname}/index.html`);
   mainWindow.loadURL('https://mail.google.com/');
 
   // Open the DevTools.
@@ -81,10 +80,11 @@ const createWindow = () => {
 
 const secureSession = () => {
   session.defaultSession.webRequest.onHeadersReceived((details, cb) => {
-    details.responseHeaders['Content-Security-Policy'] = [`default-src 'self' https://*.google.com https://*.gstatic.com 'unsafe-inline'`];
     // eslint-disable-next-line standard/no-callback-literal
     cb({
-      responseHeaders: details.responseHeaders
+      responseHeaders: Object.assign(details.responseHeaders, {
+        'Content-Security-Policy': [`default-src 'self' https://*.google.com https://*.gstatic.com 'unsafe-inline'`]
+      })
     });
   });
 };
