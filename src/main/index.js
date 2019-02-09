@@ -1,124 +1,82 @@
-import { app, session } from 'electron';
 import GmailTray from './tray';
-import { ComposeMenu, GmailMenu } from './menu';
-import { ComposeWindow, GmailWindow } from './window';
+import { GmailMenu } from './menu';
+import { GmailWindow } from './window';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
-  app.quit();
-}
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
-let composeWindow;
-let tray;
-let menubar;
-
-const trayMenu = [
-  {
-    label: 'Compose New Message',
-    click: () => {
-      composeWindow = new ComposeWindow();
-      composeWindow.loadURL(`https://mail.google.com/mail/?view=cm&fs=1`);
-      let menu = new ComposeMenu(app, composeWindow);
-      composeWindow.setMenu(menu.build());
-    }
-  },
-  { type: 'separator' },
-  {
-    label: 'Show App',
-    click: () => {
-      mainWindow.show();
-    }
-  },
-  {
-    label: 'Quit',
-    click: () => {
-      app.isQuitting = true;
-      app.quit();
-    }
+export default class GmailApp {
+  constructor (app, session) {
+    this.app = app;
+    this.session = session;
+    this.mainWindow = null;
+    this.tray = null;
+    this.menubar = null;
   }
-];
 
-const createWindow = () => {
-  mainWindow = new GmailWindow();
+  init () {
+    this.secureSession();
+    this.configureWindow();
+    this.createAppMenu();
+    this.load();
+  }
 
-  mainWindow.on('closed', () => {
-    if (tray && !tray.isDestroyed()) {
-      tray.destroy();
-    }
-  });
+  /**
+   * Method to load gmail once window is configured
+   */
+  load () {
+    this.mainWindow.loadURL('https://mail.google.com/');
+  }
 
-  mainWindow.on('close', (e) => {
-    if (!app.isQuitting) {
-      e.preventDefault();
-      mainWindow.hide();
-    } else {
-      return false;
-    }
-  });
-
-  mainWindow.on('show', () => {
-    if (tray && !tray.isDestroyed()) {
-      tray.destroy();
-    }
-  });
-
-  mainWindow.on('hide', () => {
-    if (!tray || tray.isDestroyed()) {
-      tray = new GmailTray(trayMenu);
-    }
-  });
-
-  // and load the index.html of the app.
-  mainWindow.loadURL('https://mail.google.com/');
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
-};
-
-const secureSession = () => {
-  session.defaultSession.webRequest.onHeadersReceived((details, cb) => {
-    // eslint-disable-next-line standard/no-callback-literal
-    cb({
-      responseHeaders: Object.assign(details.responseHeaders, {
-        'Content-Security-Policy': [`default-src 'self' https://*.google.com https://*.gstatic.com 'unsafe-inline'`]
-      })
+  secureSession () {
+    this.session.defaultSession.webRequest.onHeadersReceived((details, cb) => {
+      // eslint-disable-next-line standard/no-callback-literal
+      cb({
+        responseHeaders: Object.assign(details.responseHeaders, {
+          'Content-Security-Policy': [`default-src 'self' https://*.google.com https://*.gstatic.com https://*.ggpht.com 'unsafe-inline'`]
+        })
+      });
     });
-  });
-};
-
-const createAppMenu = () => {
-  menubar = new GmailMenu(app, mainWindow);
-  menubar.show();
-  menubar.autohide();
-};
-
-const init = () => {
-  secureSession();
-  createWindow();
-  createAppMenu();
-};
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', init);
-
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
   }
-});
 
-app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
+  configureWindow () {
+    this.mainWindow = new GmailWindow();
+
+    this.mainWindow.on('closed', () => {
+      if (this.tray && !this.tray.isDestroyed()) {
+        this.tray.destroy();
+      }
+    });
+
+    this.mainWindow.on('close', (e) => {
+      if (!this.app.isQuitting) {
+        e.preventDefault();
+        this.mainWindow.hide();
+      } else {
+        return false;
+      }
+    });
+
+    this.mainWindow.on('show', () => {
+      if (this.tray && !this.tray.isDestroyed()) {
+        this.tray.destroy();
+      }
+    });
+
+    this.mainWindow.on('hide', () => {
+      if (!this.tray || this.tray.isDestroyed()) {
+        this.tray = new GmailTray(this.app, this.mainWindow);
+      }
+    });
+    // Open the DevTools.
+    this.mainWindow.webContents.openDevTools();
   }
-});
+
+  recreateWindow () {
+    this.configureWindow();
+    this.load();
+  }
+
+  createAppMenu () {
+    this.menubar = new GmailMenu(this.app, this.mainWindow);
+    this.menubar.show();
+    this.menubar.autohide();
+  }
+}

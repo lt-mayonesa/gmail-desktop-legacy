@@ -3,13 +3,14 @@
   "productName": "Gmail Desktop",
   "version": "0.1.4",
   "description": "Access your Gmail inbox right from your desktop",
-  "main": "src/main/index.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make dist",
+    "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint src --color"
+    "lint": "eslint src --color",
+    "test": "mocha -- src/test/*.js"
   },
   "keywords": [],
   "author": "joaco",
@@ -77,6 +78,8 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.12.4",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^5.2.0",
+    "spectron": "^5.0.0"
   }
 }

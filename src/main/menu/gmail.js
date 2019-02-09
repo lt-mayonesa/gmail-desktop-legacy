@@ -11,8 +11,7 @@ export class GmailMenu {
   build () {
     this.template = [
       fileEntry(() => {
-        this.app.isQuitting = true;
-        this.app.quit();
+        this.app.forceQuit();
       }),
       editEntry(process.platform),
       viewEntry()
@@ -22,10 +21,7 @@ export class GmailMenu {
       this.template.push(windowEntry());
     }
     this.template.push(helpEntry(
-      // () => shell.openExternal('https://github.com/Lt-Mayonesa/gmail-desktop')
-      () => {
-        this.window.webContents.executeJavaScript(`new Notification('test')`).then((res) => console.log('caca', res));
-      }
+      () => shell.openExternal('https://github.com/Lt-Mayonesa/gmail-desktop')
     ));
     return Menu.buildFromTemplate(this.template);
   }
