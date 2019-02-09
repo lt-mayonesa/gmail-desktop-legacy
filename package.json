@@ -34,7 +34,10 @@
           ".idea"
         ],
         "executableName": "gmail-desktop",
-        "packageManager": "npm"
+        "packageManager": "npm",
+        "download": {
+          "cache": "./zips"
+        }
       },
       "electronWinstallerConfig": {
         "name": "gmail_desktop"

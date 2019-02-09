@@ -9,7 +9,6 @@ export default class GmailTray extends Tray {
     super(path.join(__dirname, '..', '..', 'static', 'icon_gmail_32.png'));
     this.app = app;
     this.window = window;
-    this.badgeCountListener = this.onUnreadListener;
     this.init();
   }
 
@@ -18,13 +17,9 @@ export default class GmailTray extends Tray {
     this.initContextMenu();
     this.setToolTip('Gmail Desktop');
     this.setTitle('Gmail Desktop');
-    if (this.composeWindow && !this.composeWindow.isDestroyed()) {
-      this.composeWindow.destroy();
-    }
-    this.newComposeWindow();
-
-    ipcMain.on(Channels.UNREAD_COUNT, (e, count) => this.badgeCountListener(e, count));
-    this.window.webContents.send(Channels.GMAIL_TRAY, Events.GmailTray.CREATED);
+    this.initComposeWindow();
+    this.initListeners();
+    this.window.sendMessage(Channels.GMAIL_TRAY, Events.GmailTray.CREATED);
   }
 
   initContextMenu () {
@@ -62,9 +57,9 @@ export default class GmailTray extends Tray {
   }
 
   destroy () {
-    this.window.webContents.send(Channels.GMAIL_TRAY, Events.GmailTray.DESTROYED);
-    ipcMain.removeListener(Channels.UNREAD_COUNT, this.badgeCountListener);
-    if (this.composeWindow) {
+    ipcMain.removeListener(Channels.UNREAD_COUNT, this.onUnreadListener);
+    this.window.sendMessage(Channels.GMAIL_TRAY, Events.GmailTray.DESTROYED);
+    if (this.composeWindow && !this.composeWindow.isDestroyed()) {
       this.composeWindow.destroy();
     }
     super.destroy();
@@ -77,12 +72,17 @@ export default class GmailTray extends Tray {
     this.composeWindow.setMenu(menu.build());
   }
 
-  onUnreadListener (e, count) {
-    console.log(count);
-    if (count) {
-      this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_badge_32.png'));
-    } else {
-      this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_32.png'));
+  initComposeWindow () {
+    if (this.composeWindow && !this.composeWindow.isDestroyed()) {
+      this.composeWindow.destroy();
     }
+    this.newComposeWindow();
+  }
+
+  initListeners () {
+    this.onUnreadListener = (e, count) => this.setImage(
+      path.join(
+        __dirname, '..', '..', 'static', `icon_gmail_${count > 0 ? 'badge_' : ''}32.png`));
+    ipcMain.on(Channels.UNREAD_COUNT, this.onUnreadListener);
   }
 }

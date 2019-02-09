@@ -2,6 +2,13 @@ const Application = require('spectron').Application;
 const assert = require('assert');
 const path = require('path');
 
+let binaryPath = '';
+if (process.platform === 'darwin') {
+  binaryPath = path.join(__dirname, '..', '..', 'out', `Gmail Desktop-darwin-x64`, 'Gmail Desktop.app');
+} else if (process.platform === 'linux') {
+  binaryPath = path.join(__dirname, '..', '..', 'out', `Gmail Desktop-linux-x64`, 'gmail-desktop');
+}
+
 describe('Application launch', function () {
   this.timeout(10000);
 
@@ -10,7 +17,7 @@ describe('Application launch', function () {
       // Your electron path can be any binary
       // i.e for OSX an example path could be '/Applications/MyApp.app/Contents/MacOS/MyApp'
       // But for the sake of the example we fetch it from our node_modules.
-      path: path.join(__dirname, '..', '..', 'out', `Gmail Desktop-${process.platform}-x64`, 'gmail-desktop')
+      path: binaryPath
     });
     return this.app.start();
   });

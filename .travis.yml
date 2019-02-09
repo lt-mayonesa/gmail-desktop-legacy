@@ -16,7 +16,7 @@ install:
 cache:
   directories:
     - node_modules
-    - $HOME/.cache/electron
+    - zips
 
 before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0          ; fi

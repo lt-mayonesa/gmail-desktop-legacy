@@ -6,6 +6,7 @@ let interval = null;
 
 ipcRenderer.on(Channels.GMAIL_TRAY, (e, data) => {
   if (data === Events.GmailTray.CREATED) {
+    lastVal = null;
     interval = setInterval(() => {
       const inboxListItem = document.querySelector('.TK .aim');
       const badge = inboxListItem.querySelector('.bsU');

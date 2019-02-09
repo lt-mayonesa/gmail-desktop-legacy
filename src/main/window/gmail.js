@@ -30,9 +30,9 @@ export class GmailWindow extends BrowserWindow {
 
   overrideAlertBehaviour () {
     this.webContents.executeJavaScript(
-      `window.alert = (message) => console.log('Alert interrupted', message);`)
-      .then((result) => {
-        console.log('Alert overriden:', result);
+      `window.alert = (message) => console.log('Alert interrupted by design', message);`)
+      .then(() => {
+        console.debug('Executed js to override window.alert');
       });
   }
 
@@ -49,6 +49,12 @@ export class GmailWindow extends BrowserWindow {
     } else {
       event.preventDefault();
       shell.openExternal(url);
+    }
+  }
+
+  sendMessage (channel, data) {
+    if (!this.isDestroyed()) {
+      this.webContents.send(channel, data);
     }
   }
 }
