@@ -66,7 +66,7 @@ export default class GmailApp {
       }
     });
     // Open the DevTools.
-    this.mainWindow.webContents.openDevTools();
+    // this.mainWindow.webContents.openDevTools();
   }
 
   recreateWindow () {
