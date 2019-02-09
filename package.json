@@ -5,12 +5,12 @@
   "description": "Access your Gmail inbox right from your desktop",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint src --color",
-    "test": "mocha -- src/test/*.js"
+    "test": "NODE_ENV=test mocha -- src/test/*.js"
   },
   "keywords": [],
   "author": "joaco",

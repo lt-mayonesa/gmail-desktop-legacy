@@ -1,9 +1,9 @@
 const ipcRenderer = require('electron').ipcRenderer;
 
 setInterval(() => {
-  console.log('tick');
-  let badge = document.getElementsByClassName('bsU')[0];
-  if (badge && badge.parentElement.getElementsByTagName('a')[0].innerText === 'Inbox') {
+  let badge = document.querySelector('div#\\3A c3 .bsU');
+  console.debug('tick', badge);
+  if (badge) {
     ipcRenderer.send('badge-count', Number(badge.innerText));
   }
-}, 500);
+}, 1000);

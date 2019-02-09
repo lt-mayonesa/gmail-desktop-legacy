@@ -11,7 +11,7 @@ export class ComposeWindow extends BrowserWindow {
       height: HEIGHT,
       icon: path.join(__dirname, '..', '..', 'static', 'icon_compose.png'),
       webPreferences: {
-        nodeIntegration: false
+        nodeIntegration: process.env.NODE_ENV === 'test'
       },
       show: false,
       skipTaskbar: true,

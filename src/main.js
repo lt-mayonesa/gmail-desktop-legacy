@@ -33,3 +33,7 @@ app.on('activate', () => {
     gmailApp.recreateWindow();
   }
 });
+
+app.on('before-quit', () => {
+  app.isQuitting = true;
+});
