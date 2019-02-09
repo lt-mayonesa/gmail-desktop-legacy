@@ -19,6 +19,7 @@ cache:
     - $HOME/.cache/electron
 
 script:
+  - npm run package
   - npm test
 
 os:
