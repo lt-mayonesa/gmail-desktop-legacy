@@ -1,22 +1,22 @@
 import { BrowserWindow, screen } from 'electron';
+import path from 'path';
 
 const WIDTH = 600;
 const HEIGHT = 500;
 
 export class ComposeWindow extends BrowserWindow {
-  constructor (props) {
+  constructor () {
     super({
       width: WIDTH,
       height: HEIGHT,
-      icon: `${__dirname}/img/icon_compose.png`,
+      icon: path.join(__dirname, '..', '..', 'static', 'icon_compose.png'),
       webPreferences: {
-        nodeIntegration: false
+        nodeIntegration: process.env.NODE_ENV === 'test'
       },
+      show: false,
+      skipTaskbar: true,
       autoHideMenuBar: true
     });
-
-    this.calculateInitialPosition(screen.getCursorScreenPoint());
-    this.setPosition(this.startPoint.x, this.startPoint.y, false);
   }
 
   calculateInitialPosition (point) {
@@ -29,5 +29,10 @@ export class ComposeWindow extends BrowserWindow {
       // y: point.y <= display.size.height / 2 ? Math.max(y, 60) : Math.min(y, display.size.height - 60)
       y: y
     };
+  }
+
+  updatePosition (animate) {
+    this.calculateInitialPosition(screen.getCursorScreenPoint());
+    this.setPosition(this.startPoint.x, this.startPoint.y, animate);
   }
 }

@@ -11,8 +11,7 @@ export class GmailMenu {
   build () {
     this.template = [
       fileEntry(() => {
-        this.app.isQuitting = true;
-        this.app.quit();
+        this.app.forceQuit();
       }),
       editEntry(process.platform),
       viewEntry()

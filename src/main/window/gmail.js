@@ -1,13 +1,15 @@
 import { BrowserWindow, shell } from 'electron';
+import path from 'path';
 
 export class GmailWindow extends BrowserWindow {
-  constructor (props) {
+  constructor () {
     super({
       width: 1024,
       height: 600,
-      icon: `${__dirname}/img/icon_gmail_512.png`,
+      icon: path.join(__dirname, '..', '..', 'static', 'icon_gmail_512.png'),
       webPreferences: {
-        nodeIntegration: false
+        nodeIntegration: process.env.NODE_ENV === 'test',
+        preload: path.join(__dirname, '..', '..', 'render', 'preload-launcher.js')
       }
     });
     this.init();
@@ -18,15 +20,19 @@ export class GmailWindow extends BrowserWindow {
   }
 
   initWebContents () {
-    this.webContents.on('did-finish-load', () => this.overrideAlertBehaviour());
+    this.webContents.on('did-finish-load', () => this.executeJsOverrides());
     this.webContents.on('new-window', (e, u) => this.overrideNewWindowBehaviour(e, u));
+  }
+
+  executeJsOverrides () {
+    this.overrideAlertBehaviour();
   }
 
   overrideAlertBehaviour () {
     this.webContents.executeJavaScript(
-      `window.alert = (message) => console.log('Alert interrupted', message);`)
-      .then((result) => {
-        console.log(result);
+      `window.alert = (message) => console.log('Alert interrupted by design', message);`)
+      .then(() => {
+        console.debug('Executed js to override window.alert');
       });
   }
 
@@ -43,6 +49,12 @@ export class GmailWindow extends BrowserWindow {
     } else {
       event.preventDefault();
       shell.openExternal(url);
+    }
+  }
+
+  sendMessage (channel, data) {
+    if (!this.isDestroyed()) {
+      this.webContents.send(channel, data);
     }
   }
 }
