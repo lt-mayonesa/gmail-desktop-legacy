@@ -9,7 +9,7 @@ export class GmailWindow extends BrowserWindow {
       icon: path.join(__dirname, '..', '..', 'static', 'icon_gmail_512.png'),
       webPreferences: {
         nodeIntegration: process.env.NODE_ENV === 'test',
-        preload: path.join(__dirname, '..', '..', 'render', 'badge-count.js')
+        preload: path.join(__dirname, '..', '..', 'render', 'preload-launcher.js')
       }
     });
     this.init();

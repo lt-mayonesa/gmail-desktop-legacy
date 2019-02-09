@@ -2,20 +2,14 @@ import path from 'path';
 import { ipcMain, Menu, Tray } from 'electron';
 import { ComposeWindow } from '../window';
 import { ComposeMenu } from '../menu';
+import { Channels, Events } from '../../ipc';
 
 export default class GmailTray extends Tray {
   constructor (app, window) {
-    super(path.join(__dirname, '..', '..', 'static', 'icon_gmail_16.png'));
+    super(path.join(__dirname, '..', '..', 'static', 'icon_gmail_32.png'));
     this.app = app;
     this.window = window;
-    this.badgeCountListener = (e, count) => {
-      console.log('ipcmain', count);
-      if (count) {
-        this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_badge_32.png'));
-      } else {
-        this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_32.png'));
-      }
-    };
+    this.badgeCountListener = this.onUnreadListener;
     this.init();
   }
 
@@ -29,7 +23,8 @@ export default class GmailTray extends Tray {
     }
     this.newComposeWindow();
 
-    ipcMain.on('badge-count', this.badgeCountListener);
+    ipcMain.on(Channels.UNREAD_COUNT, (e, count) => this.badgeCountListener(e, count));
+    this.window.webContents.send(Channels.GMAIL_TRAY, Events.GmailTray.CREATED);
   }
 
   initContextMenu () {
@@ -42,7 +37,7 @@ export default class GmailTray extends Tray {
       {
         label: 'Compose New Message',
         click: () => {
-          if (!this.composeWindow.isDestroyed()) {
+          if (this.composeWindow && !this.composeWindow.isDestroyed()) {
             this.composeWindow.updatePosition(false);
             this.composeWindow.show();
             this.composeWindow.setSkipTaskbar(false);
@@ -67,7 +62,11 @@ export default class GmailTray extends Tray {
   }
 
   destroy () {
-    ipcMain.removeAllListeners('badge-count', this.badgeCountListener);
+    this.window.webContents.send(Channels.GMAIL_TRAY, Events.GmailTray.DESTROYED);
+    ipcMain.removeListener(Channels.UNREAD_COUNT, this.badgeCountListener);
+    if (this.composeWindow) {
+      this.composeWindow.destroy();
+    }
     super.destroy();
   }
 
@@ -76,5 +75,14 @@ export default class GmailTray extends Tray {
     this.composeWindow.loadURL(`https://mail.google.com/mail/?view=cm&fs=1`);
     let menu = new ComposeMenu(this.app, this.composeWindow);
     this.composeWindow.setMenu(menu.build());
+  }
+
+  onUnreadListener (e, count) {
+    console.log(count);
+    if (count) {
+      this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_badge_32.png'));
+    } else {
+      this.setImage(path.join(__dirname, '..', '..', 'static', 'icon_gmail_32.png'));
+    }
   }
 }
