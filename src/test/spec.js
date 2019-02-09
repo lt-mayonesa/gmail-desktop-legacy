@@ -4,7 +4,7 @@ const path = require('path');
 
 let binaryPath = '';
 if (process.platform === 'darwin') {
-  binaryPath = path.join(__dirname, '..', '..', 'out', `Gmail Desktop-darwin-x64`, 'Gmail Desktop.app', 'Contents', 'MacOS', 'gmail-desktop');
+  binaryPath = path.join(__dirname, '..', '..', 'out', `Gmail Desktop-darwin-x64`, 'Gmail Desktop.app', 'Contents', 'MacOS', 'Gmail Desktop');
 } else if (process.platform === 'linux') {
   binaryPath = path.join(__dirname, '..', '..', 'out', `Gmail Desktop-linux-x64`, 'gmail-desktop');
 }

@@ -30,7 +30,7 @@ before_script:
 
 script:
   - npm run package
-  - npm test
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm test; fi
 
 os:
   - linux
