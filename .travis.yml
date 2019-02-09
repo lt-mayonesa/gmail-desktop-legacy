@@ -3,6 +3,11 @@ sudo: false
 node_js:
   - 8
 
+branches:
+  only:
+    - master
+    - develop
+
 addons:
   apt:
     update: true
@@ -16,15 +21,23 @@ install:
 cache:
   directories:
     - node_modules
-    - $HOME/.cache/electron
+    - zips
+
+before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start          ; fi
+  - sleep 3 # give xvfb some time to start
 
 script:
-  - npm test
-  - npm run make
+  - npm run package
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm test; fi
 
 os:
   - linux
   - osx
+
+before_deploy:
+  - npm run make
 
 deploy:
   provider: releases
