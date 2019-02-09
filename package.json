@@ -31,7 +31,8 @@
       },
       "electronPackagerConfig": {
         "ignore": [
-          ".idea"
+          ".idea",
+          "zips"
         ],
         "executableName": "gmail-desktop",
         "packageManager": "npm",
