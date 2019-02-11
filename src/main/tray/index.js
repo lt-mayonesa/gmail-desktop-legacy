@@ -1,7 +1,6 @@
 import path from 'path';
 import { ipcMain, Tray } from 'electron';
 import { ComposeWindow } from '../window';
-import { ComposeMenu } from '../menu';
 import { Channels, Events } from '../../ipc';
 import { GmailTrayMenu } from './menu';
 
@@ -57,8 +56,6 @@ export default class GmailTray extends Tray {
   newComposeWindow () {
     this.composeWindow = new ComposeWindow();
     this.composeWindow.loadURL(`https://mail.google.com/mail/?view=cm&fs=1`);
-    let menu = new ComposeMenu(this.app, this.composeWindow);
-    this.composeWindow.setMenu(menu.build());
   }
 
   initComposeWindow () {

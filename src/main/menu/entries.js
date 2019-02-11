@@ -85,7 +85,7 @@ export const helpEntry = (onHelp) => {
 
 export const appEntry = () => {
   return {
-    label: this.app.getName(),
+    label: 'Gmail Desktop',
     submenu: [
       { role: 'about' },
       { type: 'separator' },
