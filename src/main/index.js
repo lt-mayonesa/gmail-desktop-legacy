@@ -56,20 +56,17 @@ export default class GmailApp {
 
     this.mainWindow.on('show', () => {
       if (this.tray && !this.tray.isDestroyed()) {
-        // this.tray.destroy();
+        this.tray.destroy();
       }
     });
 
     this.mainWindow.on('hide', () => {
       if (!this.tray || this.tray.isDestroyed()) {
-        // this.tray = new GmailTray(this.app, this.mainWindow);
+        this.tray = new GmailTray(this.app, this.mainWindow);
       }
     });
     // Open the DevTools.
     if (process.env.NODE_ENV === 'development') {
-      setTimeout(() => {
-        this.tray = new GmailTray(this.app, this.mainWindow);
-      }, 3000);
       this.mainWindow.webContents.openDevTools();
     }
   }
