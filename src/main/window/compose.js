@@ -1,5 +1,6 @@
 import { BrowserWindow, screen } from 'electron';
 import path from 'path';
+import { ComposeMenu } from '../menu';
 
 const WIDTH = 600;
 const HEIGHT = 500;
@@ -17,6 +18,8 @@ export class ComposeWindow extends BrowserWindow {
       skipTaskbar: true,
       autoHideMenuBar: true
     });
+    let menu = new ComposeMenu(this);
+    this.setMenu(menu.build());
   }
 
   calculateInitialPosition (point) {

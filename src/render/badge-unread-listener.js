@@ -1,22 +1,20 @@
 import { ipcRenderer } from 'electron';
 import { Channels, Events } from '../ipc';
+import UnreadObserver from './observer/unread-observer';
 
-let lastVal = null;
-let interval = null;
+const observer = new UnreadObserver(ipcRenderer);
 
 ipcRenderer.on(Channels.GMAIL_TRAY, (e, data) => {
   if (data === Events.GmailTray.CREATED) {
-    lastVal = null;
-    interval = setInterval(() => {
-      const inboxListItem = document.querySelector('.TK .aim');
-      const badge = inboxListItem.querySelector('.bsU');
-      let unreadCount = Number(badge && badge.innerText) || 0;
-      if (unreadCount !== lastVal) {
-        ipcRenderer.send(Channels.UNREAD_COUNT, unreadCount);
-        lastVal = unreadCount;
-      }
-    }, 1000);
+    let list = document.querySelector('.TK');
+    let inboxListItem = list.querySelector('.aim');
+    observer.observe(list, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+    observer.sendIfNeeded(observer.currentValue(inboxListItem));
   } else if (data === Events.GmailTray.DESTROYED) {
-    clearInterval(interval);
+    observer.disconnect();
   }
 });
