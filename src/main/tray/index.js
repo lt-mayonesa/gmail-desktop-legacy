@@ -45,7 +45,7 @@ export default class GmailTray extends Tray {
   }
 
   destroy () {
-    ipcMain.removeListener(Channels.UNREAD_COUNT, this.onUnreadListener);
+    this.destroyListeners();
     this.window.sendMessage(Channels.GMAIL_TRAY, Events.GmailTray.DESTROYED);
     if (this.composeWindow && !this.composeWindow.isDestroyed()) {
       this.composeWindow.destroy();
@@ -72,5 +72,9 @@ export default class GmailTray extends Tray {
       this.refresh();
     };
     ipcMain.on(Channels.UNREAD_COUNT, this.onUnreadListener);
+  }
+
+  destroyListeners () {
+    ipcMain.removeListener(Channels.UNREAD_COUNT, this.onUnreadListener);
   }
 }

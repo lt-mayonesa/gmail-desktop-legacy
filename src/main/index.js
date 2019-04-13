@@ -12,10 +12,23 @@ export default class GmailApp {
   }
 
   init () {
+    this.makeSingleInstance();
     this.secureSession();
     this.configureWindow();
     this.createAppMenu();
     this.load();
+  }
+
+  makeSingleInstance () {
+    let isPrimary = this.app.requestSingleInstanceLock();
+
+    if (!isPrimary) {
+      this.app.quit();
+    } else {
+      this.app.on('second-instance', (event, commandLine, workingDir) => {
+        this.show();
+      });
+    }
   }
 
   /**
@@ -80,5 +93,11 @@ export default class GmailApp {
     this.menubar = new GmailMenu(this.app, this.mainWindow);
     this.menubar.show();
     this.menubar.autohide();
+  }
+
+  show () {
+    if (this.mainWindow) {
+      this.mainWindow.ensureShow();
+    }
   }
 }

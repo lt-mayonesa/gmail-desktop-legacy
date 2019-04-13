@@ -1,4 +1,5 @@
 import { Menu } from 'electron';
+import { Channels, Events } from '../../../ipc';
 
 export class GmailTrayMenu {
   constructor (tray, options) {
@@ -9,6 +10,7 @@ export class GmailTrayMenu {
         label: 'Show App',
         click: () => {
           this.tray.window.show();
+          this.tray.window.sendMessage(Channels.ACTIONS, Events.Actions.SHOW_INBOX);
         }
       },
       options.showApp

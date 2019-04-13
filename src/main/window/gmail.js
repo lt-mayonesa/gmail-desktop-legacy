@@ -57,4 +57,9 @@ export class GmailWindow extends BrowserWindow {
       this.webContents.send(channel, data);
     }
   }
+
+  ensureShow () {
+    if (this.isMinimized()) this.restore();
+    this.show();
+  }
 }
