@@ -3,8 +3,23 @@ import { Channels } from '../../ipc';
 
 export default class UnreadObserver extends MutationObserver {
   constructor (ipc) {
+    // noinspection JSCheckFunctionSignatures
     super((mutations) => this.onChanges(mutations));
     this.ipc = ipc;
+    this.lastValue = null;
+  }
+
+  observe (target) {
+    super.observe(target, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+    this.sendIfNeeded(this.currentValue(target));
+  }
+
+  disconnect () {
+    super.disconnect();
     this.lastValue = null;
   }
 
@@ -20,8 +35,10 @@ export default class UnreadObserver extends MutationObserver {
     }
   }
 
-  currentValue (item) {
-    let badge = item.querySelector('.bsU');
+  currentValue (target) {
+    if (target.className === '.TK')
+      target = target.querySelector('.aim');
+    let badge = target.querySelector('.bsU');
     return Number(badge && badge.innerText) || 0;
   }
 }
