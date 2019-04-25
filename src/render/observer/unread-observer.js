@@ -24,7 +24,7 @@ export default class UnreadObserver extends MutationObserver {
   }
 
   onChanges (mutations) {
-    let inboxListItem = mutations[0].target.querySelector('.aim');
+    let inboxListItem = mutations[0].target.querySelector('.aim.ain');
     this.sendIfNeeded(this.currentValue(inboxListItem));
   }
 
@@ -36,8 +36,8 @@ export default class UnreadObserver extends MutationObserver {
   }
 
   currentValue (target) {
-    if (target.className === '.TK')
-      target = target.querySelector('.aim');
+    if (target.className === 'TK')
+      target = target.querySelector('.aim.ain');
     let badge = target.querySelector('.bsU');
     return Number(badge && badge.innerText) || 0;
   }
